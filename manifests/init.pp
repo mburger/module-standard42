@@ -13,6 +13,9 @@
 #   If defined, standard42 class will automatically "include $my_class"
 #   Can be defined also by the (top scope) variable $standard42_myclass
 #
+# [*dependency_class*]
+#   Name of the class that provides third module dependencies
+#
 # [*source*]
 #   Sets the content of source parameter for main configuration file
 #   If defined, standard42 main config file will have the param: source => $source
@@ -200,47 +203,50 @@
 # See README for usage patterns.
 #
 class standard42 (
-  $my_class            = params_lookup( 'my_class' ),
-  $source              = params_lookup( 'source' ),
-  $source_dir          = params_lookup( 'source_dir' ),
-  $source_dir_purge    = params_lookup( 'source_dir_purge' ),
-  $template            = params_lookup( 'template' ),
-  $service_autorestart = params_lookup( 'service_autorestart' , 'global' ),
-  $options             = params_lookup( 'options' ),
-  $version             = params_lookup( 'version' ),
-  $absent              = params_lookup( 'absent' ),
-  $disable             = params_lookup( 'disable' ),
-  $disableboot         = params_lookup( 'disableboot' ),
-  $monitor             = params_lookup( 'monitor' , 'global' ),
-  $monitor_tool        = params_lookup( 'monitor_tool' , 'global' ),
-  $monitor_target      = params_lookup( 'monitor_target' , 'global' ),
-  $puppi               = params_lookup( 'puppi' , 'global' ),
-  $puppi_helper        = params_lookup( 'puppi_helper' , 'global' ),
-  $firewall            = params_lookup( 'firewall' , 'global' ),
-  $firewall_tool       = params_lookup( 'firewall_tool' , 'global' ),
-  $firewall_src        = params_lookup( 'firewall_src' , 'global' ),
-  $firewall_dst        = params_lookup( 'firewall_dst' , 'global' ),
-  $debug               = params_lookup( 'debug' , 'global' ),
-  $audit_only          = params_lookup( 'audit_only' , 'global' ),
-  $noops               = params_lookup( 'noops' ),
-  $package             = params_lookup( 'package' ),
-  $service             = params_lookup( 'service' ),
-  $service_status      = params_lookup( 'service_status' ),
-  $process             = params_lookup( 'process' ),
-  $process_args        = params_lookup( 'process_args' ),
-  $process_user        = params_lookup( 'process_user' ),
-  $config_dir          = params_lookup( 'config_dir' ),
-  $config_file         = params_lookup( 'config_file' ),
-  $config_file_mode    = params_lookup( 'config_file_mode' ),
-  $config_file_owner   = params_lookup( 'config_file_owner' ),
-  $config_file_group   = params_lookup( 'config_file_group' ),
-  $config_file_init    = params_lookup( 'config_file_init' ),
-  $pid_file            = params_lookup( 'pid_file' ),
-  $data_dir            = params_lookup( 'data_dir' ),
-  $log_dir             = params_lookup( 'log_dir' ),
-  $log_file            = params_lookup( 'log_file' ),
-  $port                = params_lookup( 'port' ),
-  $protocol            = params_lookup( 'protocol' )
+  $my_class                   = params_lookup( 'my_class' ),
+  $dependency_class           = params_lookup( 'dependency_class' ),
+  $source                     = params_lookup( 'source' ),
+  $source_dir                 = params_lookup( 'source_dir' ),
+  $source_dir_purge           = params_lookup( 'source_dir_purge' ),
+  $template                   = params_lookup( 'template' ),
+  $service_autorestart        = params_lookup( 'service_autorestart' , 'global' ),
+  $options                    = params_lookup( 'options' ),
+  $version                    = params_lookup( 'version' ),
+  $absent                     = params_lookup( 'absent' ),
+  $disable                    = params_lookup( 'disable' ),
+  $disableboot                = params_lookup( 'disableboot' ),
+  $monitor                    = params_lookup( 'monitor' , 'global' ),
+  $monitor_tool               = params_lookup( 'monitor_tool' , 'global' ),
+  $monitor_target             = params_lookup( 'monitor_target' , 'global' ),
+  $puppi                      = params_lookup( 'puppi' , 'global' ),
+  $puppi_helper               = params_lookup( 'puppi_helper' , 'global' ),
+  $firewall                   = params_lookup( 'firewall' , 'global' ),
+  $firewall_tool              = params_lookup( 'firewall_tool' , 'global' ),
+  $firewall_src               = params_lookup( 'firewall_src' , 'global' ),
+  $firewall_dst               = params_lookup( 'firewall_dst' , 'global' ),
+  $debug                      = params_lookup( 'debug' , 'global' ),
+  $audit_only                 = params_lookup( 'audit_only' , 'global' ),
+  $noops                      = params_lookup( 'noops' ),
+  $package                    = params_lookup( 'package' ),
+  $service                    = params_lookup( 'service' ),
+  $service_status             = params_lookup( 'service_status' ),
+  $process                    = params_lookup( 'process' ),
+  $process_args               = params_lookup( 'process_args' ),
+  $process_user               = params_lookup( 'process_user' ),
+  $config_dir                 = params_lookup( 'config_dir' ),
+  $config_file                = params_lookup( 'config_file' ),
+  $config_file_mode           = params_lookup( 'config_file_mode' ),
+  $config_file_owner          = params_lookup( 'config_file_owner' ),
+  $config_file_group          = params_lookup( 'config_file_group' ),
+  $config_file_init           = params_lookup( 'config_file_init' ),
+  $config_file_init_source    = params_lookup( 'config_file_init_source'),
+  $config_file_init_template  = params_lookup( 'config_file_init_template' ),
+  $pid_file                   = params_lookup( 'pid_file' ),
+  $data_dir                   = params_lookup( 'data_dir' ),
+  $log_dir                    = params_lookup( 'log_dir' ),
+  $log_file                   = params_lookup( 'log_file' ),
+  $port                       = params_lookup( 'port' ),
+  $protocol                   = params_lookup( 'protocol' )
   ) inherits standard42::params {
 
   $bool_source_dir_purge=any2bool($source_dir_purge)
@@ -324,58 +330,41 @@ class standard42 (
     default   => template($standard42::template),
   }
 
-  ### Managed resources
-  package { $standard42::package:
-    ensure  => $standard42::manage_package,
-    noop    => $standard42::noops,
+  $manage_config_file_init_source = $standard42::config_file_init_source ? {
+    ''        => undef,
+    default   => $standard42::config_file_init_source,
   }
 
-  service { 'standard42':
-    ensure     => $standard42::manage_service_ensure,
-    name       => $standard42::service,
-    enable     => $standard42::manage_service_enable,
-    hasstatus  => $standard42::service_status,
-    pattern    => $standard42::process,
-    require    => Package[$standard42::package],
-    noop       => $standard42::noops,
-  }
-
-  file { 'standard42.conf':
-    ensure  => $standard42::manage_file,
-    path    => $standard42::config_file,
-    mode    => $standard42::config_file_mode,
-    owner   => $standard42::config_file_owner,
-    group   => $standard42::config_file_group,
-    require => Package[$standard42::package],
-    notify  => $standard42::manage_service_autorestart,
-    source  => $standard42::manage_file_source,
-    content => $standard42::manage_file_content,
-    replace => $standard42::manage_file_replace,
-    audit   => $standard42::manage_audit,
-    noop    => $standard42::noops,
-  }
-
-  # The whole standard42 configuration directory can be recursively overriden
-  if $standard42::source_dir {
-    file { 'standard42.dir':
-      ensure  => directory,
-      path    => $standard42::config_dir,
-      require => Package[$standard42::package],
-      notify  => $standard42::manage_service_autorestart,
-      source  => $standard42::source_dir,
-      recurse => true,
-      purge   => $standard42::bool_source_dir_purge,
-      force   => $standard42::bool_source_dir_purge,
-      replace => $standard42::manage_file_replace,
-      audit   => $standard42::manage_audit,
-      noop    => $standard42::noops,
-    }
+  $manage_config_file_init_template = $standard42::config_file_init_template ? {
+    ''        => undef,
+    default   => template($standard42::config_file_init_template),
   }
 
 
   ### Include custom class if $my_class is set
   if $standard42::my_class {
     include $standard42::my_class
+  }
+
+  ### Include dependencies provided by other modules
+  if $standard42::dependency_class {
+    require $standard42::dependency_class
+  }
+
+  ### Managed resources
+  case $standard42::bool_absent {
+    true: {
+      class { 'standard42::service': } ->
+      class { 'standard42::config': } ->
+      class { 'standard42::install': } ->
+      Class['standard42']
+    }
+    false:{
+      class { 'standard42::install': } ->
+      class { 'standard42::config': } ->
+      class { 'standard42::service': } ->
+      Class['standard42']
+    }
   }
 
 

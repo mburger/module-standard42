@@ -86,6 +86,7 @@ class standard42::params {
 
   # General Settings
   $my_class = ''
+  $dependency_class = ''
   $source = ''
   $source_dir = ''
   $source_dir_purge = false
@@ -96,6 +97,8 @@ class standard42::params {
   $absent = false
   $disable = false
   $disableboot = false
+  $config_file_init_source = ''
+  $config_file_init_template = ''
 
   ### General module variables that can have a site or per module default
   $monitor = false
